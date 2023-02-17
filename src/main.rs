@@ -1,9 +1,15 @@
-use std::{fs, io};
+use std::fs;
 
-fn main() -> io::Result<()>{
+fn main(){
     /* use first argument as server directory where all the files are placed
      * fail with proper error message otherwise */
-    let dir = std::env::args().nth(1).expect("serve directory missing");
+    let dir = match std::env::args().nth(1){
+        Some(dir) => dir,
+        None => {
+            println!("usage: blogstage <dir>");
+            return
+        }
+    };
 
     /* create new web_server before adding all the routes */
     let server = web_server::new();
@@ -12,17 +18,14 @@ fn main() -> io::Result<()>{
      * where the route equals the path
      * this should should be enough for a simple web server
      */
-    fs::read_dir(dir)?
-        .map(|res| {
-            res.map(|e| {
-                server.get(e.path(), Box::new(|_,_| {
-                    std::path::Path::new(&e.path()).into()
-                }))
-            })
-        });
+    for entry in fs::read_dir(dir).unwrap() {
+        let entry = entry.unwrap();
+
+        server.get(entry.file_name().to_str().unwrap(), Box::new(|_,_| {
+            entry.path().to_str().unwrap().into()
+        }));
+    }
 
     /* start server blocking */
     server.launch(8080);
-
-    Ok(())
 }

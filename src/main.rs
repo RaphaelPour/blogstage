@@ -1,31 +1,36 @@
-use std::fs;
+use std::io::{prelude::*, BufReader};
+use std::net::{TcpListener, TcpStream};
+
+// https://doc.rust-lang.org/book/ch20-01-single-threaded.html
 
 fn main(){
-    /* use first argument as server directory where all the files are placed
-     * fail with proper error message otherwise */
-    let dir = match std::env::args().nth(1){
-        Some(dir) => dir,
-        None => {
-            println!("usage: blogstage <dir>");
+    let listener = match TcpListener::bind("127.0.0.1:8080") {
+        Ok(l) => l,
+        Err(e) => {
+            println!("error on binding to 127.0.0.1:8080: {}", e);
             return
         }
     };
 
-    /* create new web_server before adding all the routes */
-    let server = web_server::new();
-    
-    /* iterate through the given directory and add a route for every path
-     * where the route equals the path
-     * this should should be enough for a simple web server
-     */
-    for entry in fs::read_dir(dir).unwrap() {
-        let entry = entry.unwrap();
-
-        server.get(entry.file_name().to_str().unwrap(), Box::new(|_,_| {
-            entry.path().to_str().unwrap().into()
-        }));
+    for stream in listener.incoming() {
+        match stream {
+            Ok(s) => on_request(s),
+            Err(e) => {
+                println!("error accepting connection: {}", e);
+                continue
+            }
+        }
     }
+}
 
-    /* start server blocking */
-    server.launch(8080);
+fn on_request(mut stream: TcpStream) {
+    let reader = BufReader::new(&mut stream);
+    let request: Vec<_> = reader
+        .lines()
+        .map(|result| result.unwrap())
+        .take_while(|line| !line.is_empty())
+        .collect();
+
+    let response = "HTTP/1.1 200 OK\r\n\r\nblogstage\r\n";
+    stream.write_all(response.as_bytes()).unwrap();
 }

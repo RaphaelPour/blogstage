@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::fs;
+use std::thread;
 use std::io::{prelude::*, BufReader};
 use std::net::{TcpListener, TcpStream};
 use std::path::PathBuf;
@@ -63,7 +64,12 @@ fn main() {
 
     for stream in listener.incoming() {
         match stream {
-            Ok(s) => on_request(s, files.clone()),
+            Ok(s) => {
+             let f = files.clone();
+             thread::spawn(move|| {
+                on_request(s, f)
+             });
+            },
             Err(e) => {
                 println!("error accepting connection: {}", e);
                 continue;

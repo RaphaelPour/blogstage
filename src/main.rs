@@ -4,6 +4,7 @@ use std::thread;
 use std::io::{prelude::*, BufReader};
 use std::net::{TcpListener, TcpStream};
 use std::path::PathBuf;
+use mime_guess;
 
 // https://doc.rust-lang.org/book/ch20-01-single-threaded.html
 
@@ -92,19 +93,24 @@ fn on_request(mut stream: TcpStream, files: HashMap<String, PathBuf>) {
         target = "index.html".into()
     }
 
-    let response = match files.get(&target) {
+    let mime = mime_guess::from_path(target.clone()).first().unwrap();
+
+    match files.get(&target) {
         Some(path) => {
-            let body = fs::read_to_string(path).unwrap();
+            let body = fs::read(path).unwrap();
             let length = body.len();
 
             println!("200 {}", target);
-            format!("HTTP/1.1 200 OK\r\nContent-Length: {length}\r\n\r\n{body}")
+            stream.write_all(
+                format!("HTTP/1.1 200 OK\r\nContent-Length: {length}\r\nContent-Type: {mime}\r\n\r\n")
+                .as_bytes()
+                ).unwrap();
+            stream.write_all(&body).unwrap();
         }
         None => {
             println!("404 {}", target);
-            "HTTP/1.1 404 NOT FOUND\r\n\r\n".into()
+            stream.write_all("HTTP/1.1 404 NOT FOUND\r\n\r\n".as_bytes()).unwrap();
         }
     };
 
-    stream.write_all(response.as_bytes()).unwrap();
 }

@@ -2,3 +2,6 @@
 name = "blogstage"
 version = "0.1.0"
 edition = "2021"
+
+[dependencies]
+mime_guess = "2.0.4"

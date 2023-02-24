@@ -1,13 +1,12 @@
 use std::collections::HashMap;
 use std::fs;
 use std::thread;
-use std::io::{prelude::*, BufReader};
-use std::net::{TcpListener, TcpStream};
+use std::io::{prelude::*, BufReader, Read, Write};
+use std::net::TcpListener;
 use std::path::PathBuf;
 use mime_guess;
 
 // https://doc.rust-lang.org/book/ch20-01-single-threaded.html
-
 fn main() {
     /* parse arguments */
     let uri = match std::env::args().nth(1) {
@@ -79,7 +78,7 @@ fn main() {
     }
 }
 
-fn on_request(mut stream: TcpStream, files: HashMap<String, PathBuf>) {
+fn on_request(mut stream: impl Read + Write, files: HashMap<String, PathBuf>) {
     let reader = BufReader::new(&mut stream);
     let request: Vec<_> = reader
         .lines()

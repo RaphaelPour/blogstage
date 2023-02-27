@@ -5,6 +5,7 @@ use std::io::{prelude::*, BufReader, Read, Write};
 use std::net::TcpListener;
 use std::path::PathBuf;
 use mime_guess;
+use flate2::read::DeflateDecoder;
 
 // https://doc.rust-lang.org/book/ch20-01-single-threaded.html
 fn main() {

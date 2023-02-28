@@ -1,11 +1,11 @@
+use flate2::read::DeflateDecoder;
+use mime_guess;
 use std::collections::HashMap;
 use std::fs;
-use std::thread;
 use std::io::{prelude::*, BufReader, Read, Write};
 use std::net::TcpListener;
 use std::path::PathBuf;
-use mime_guess;
-use flate2::read::DeflateDecoder;
+use std::thread;
 
 // https://doc.rust-lang.org/book/ch20-01-single-threaded.html
 fn main() {
@@ -50,13 +50,7 @@ fn main() {
                 .into_string()
                 .unwrap()
                 .clone(),
-            fs::read(
-            entry
-                .as_ref()
-                .unwrap()
-                .path()
-                .clone()
-            ).unwrap()
+            fs::read(entry.as_ref().unwrap().path().clone()).unwrap(),
         );
     }
 
@@ -72,11 +66,9 @@ fn main() {
     for stream in listener.incoming() {
         match stream {
             Ok(s) => {
-             let f = files.clone();
-             thread::spawn(move|| {
-                on_request(s, f)
-             });
-            },
+                let f = files.clone();
+                thread::spawn(move || on_request(s, f));
+            }
             Err(e) => {
                 println!("error accepting connection: {}", e);
                 continue;
@@ -114,8 +106,9 @@ fn on_request(mut stream: impl Read + Write, files: HashMap<String, Vec<u8>>) {
         }
         None => {
             println!("404 {}", target);
-            stream.write_all("HTTP/1.1 404 NOT FOUND\r\n\r\n".as_bytes()).unwrap();
+            stream
+                .write_all("HTTP/1.1 404 NOT FOUND\r\n\r\n".as_bytes())
+                .unwrap();
         }
     };
-
 }

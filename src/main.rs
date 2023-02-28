@@ -1,4 +1,3 @@
-use flate2::read::DeflateDecoder;
 use mime_guess;
 use std::collections::HashMap;
 use std::fs;

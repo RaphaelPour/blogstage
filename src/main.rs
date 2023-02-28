@@ -50,7 +50,13 @@ fn main() {
                 .into_string()
                 .unwrap()
                 .clone(),
-            entry.as_ref().unwrap().path().clone(),
+            fs::read(
+            entry
+                .as_ref()
+                .unwrap()
+                .path()
+                .clone()
+            ).unwrap()
         );
     }
 
@@ -79,7 +85,7 @@ fn main() {
     }
 }
 
-fn on_request(mut stream: impl Read + Write, files: HashMap<String, PathBuf>) {
+fn on_request(mut stream: impl Read + Write, files: HashMap<String, Vec<u8>>) {
     let reader = BufReader::new(&mut stream);
     let request: Vec<_> = reader
         .lines()
@@ -96,8 +102,7 @@ fn on_request(mut stream: impl Read + Write, files: HashMap<String, PathBuf>) {
     let mime = mime_guess::from_path(target.clone()).first().unwrap();
 
     match files.get(&target) {
-        Some(path) => {
-            let body = fs::read(path).unwrap();
+        Some(body) => {
             let length = body.len();
 
             println!("200 {}", target);

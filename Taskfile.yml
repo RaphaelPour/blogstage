@@ -2,19 +2,41 @@ version: '2'
 output: 'prefixed'
 
 tasks:
+  bin:
+    desc: Build binary
+    cmds: 
+      - cargo build
   bin-cov:
-    cmds:
+    desc: Build coverage binary
+    cmds: 
       - cargo build
     env:
       RUSTFLAGS: "-C instrument-coverage" 
       LLVM_PROFILE_FILE: "cargo-test-%p-%m.profraw"
+  format:
+    desc: Format code via rustfmt
+    cmds: 
+      - rustfmt src/main.rs
+      - rustfmt tests/test.rs
+  lint:
+    desc: Run linter clippy
+    deps:
+      - format
+    cmds: 
+      - cargo clippy
+  changelog:
+    desc: Add new changelog entry
+    cmds:
+      - ish: changelogger
   test:
+    desc: Run tests
     cmds:
       - cargo test --color=always
     env:
       RUSTFLAGS: "-C instrument-coverage" 
       LLVM_PROFILE_FILE: "cargo-test-%p-%m.profraw"
   cov:
+    desc: Generate coverage report
     cmds:
       - mkdir -p coverage
       - rust-profdata merge -sparse *.profraw -o coverage/blogstage.profdata

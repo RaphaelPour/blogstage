@@ -63,8 +63,9 @@ fn main() {
 
     // react to Ctrl+C
     ctrlc::set_handler(move || {
-            std::process::exit(0);
-    }).unwrap();
+        std::process::exit(0);
+    })
+    .unwrap();
 
     for stream in listener.incoming() {
         match stream {
@@ -79,4 +80,3 @@ fn main() {
         }
     }
 }
-

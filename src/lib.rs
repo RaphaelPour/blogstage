@@ -1,4 +1,3 @@
-use mime_guess;
 use std::collections::HashMap;
 use std::io::{prelude::*, BufReader, Read, Write};
 
@@ -15,7 +14,7 @@ pub fn on_request(mut stream: impl Read + Write, files: HashMap<String, Vec<u8>>
 
     let mut target: String = request[0].split(' ').collect::<Vec<&str>>()[1][1..].to_string();
 
-    if target == "" {
+    if target.is_empty() {
         target = "index.html".into()
     }
 
@@ -30,7 +29,7 @@ pub fn on_request(mut stream: impl Read + Write, files: HashMap<String, Vec<u8>>
                 format!("HTTP/1.1 200 OK\r\nContent-Length: {length}\r\nContent-Type: {mime}\r\n\r\n")
                 .as_bytes()
                 ).unwrap();
-            stream.write_all(&body).unwrap();
+            stream.write_all(body).unwrap();
         }
         None => {
             println!("404 {}", target);

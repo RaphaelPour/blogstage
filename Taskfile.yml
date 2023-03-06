@@ -9,10 +9,11 @@ tasks:
   bin-cov:
     desc: Build coverage binary
     cmds: 
+      - mkdir -p coverage
       - cargo build
     env:
       RUSTFLAGS: "-C instrument-coverage" 
-      LLVM_PROFILE_FILE: "cargo-test-%p-%m.profraw"
+      LLVM_PROFILE_FILE: "coverage/cargo-test-%p-%m.profraw"
   format:
     desc: Format code via rustfmt
     cmds: 
@@ -36,13 +37,13 @@ tasks:
   test:
     desc: Run tests
     cmds:
+      - mkdir -p coverage
       - cargo test --color=always
     env:
       RUSTFLAGS: "-C instrument-coverage" 
-      LLVM_PROFILE_FILE: "cargo-test-%p-%m.profraw"
+      LLVM_PROFILE_FILE: "coverage/cargo-test-%p-%m.profraw"
   cov:
     desc: Generate coverage report
     cmds:
-      - mkdir -p coverage
       - rust-profdata merge -sparse *.profraw -o coverage/blogstage.profdata
       - rust-cov show target/debug/blogstage -instr-profile=coverage/blogstage.profdata --ignore-filename-regex=/.cargo --format=html --show-line-counts-or-regions > coverage/index.html

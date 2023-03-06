@@ -1,0 +1,36 @@
+
+on: [push]
+name: Blogstage
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - name: Install Task
+        run: curl -Ls https://git.io/ttask.sh | sh
+      - name: Run lint task
+        run: ./bin/task lint
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - name: Install Task
+        run: curl -Ls https://git.io/ttask.sh | sh
+      - name: Run lint task
+        run: ./bin/task test

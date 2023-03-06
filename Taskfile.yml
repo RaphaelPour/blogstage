@@ -18,6 +18,11 @@ tasks:
     cmds: 
       - rustfmt --check src/main.rs
       - rustfmt --check tests/test.rs
+  format-fix:
+    desc: Fix format code via rustfmt
+    cmds: 
+      - rustfmt src/main.rs
+      - rustfmt tests/test.rs
   lint:
     desc: Run linter clippy
     deps:

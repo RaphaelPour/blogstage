@@ -16,14 +16,14 @@ tasks:
   format:
     desc: Format code via rustfmt
     cmds: 
-      - rustfmt src/main.rs
-      - rustfmt tests/test.rs
+      - rustfmt --check src/main.rs
+      - rustfmt --check tests/test.rs
   lint:
     desc: Run linter clippy
     deps:
       - format
     cmds: 
-      - cargo clippy
+      - cargo clippy --color=always -- -Dwarnings
   changelog:
     desc: Add new changelog entry
     cmds:

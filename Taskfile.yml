@@ -5,7 +5,7 @@ tasks:
   bin:
     desc: Build binary
     cmds: 
-      - cargo build
+      - cargo build --release --target x86_64-unknown-linux-musl
   bin-cov:
     desc: Build coverage binary
     cmds: 

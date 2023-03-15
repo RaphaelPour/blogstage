@@ -31,7 +31,7 @@ jobs:
           toolchain: stable
           override: true
       - name: Install coverage profiler
-        run: sudo apt update && sudo apt install -y cargo-binutils
+        run: cargo install cargo-binutils
       - name: Install Task
         run: curl -Ls https://git.io/ttask.sh | sh
       - name: Run tests

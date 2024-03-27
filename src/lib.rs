@@ -16,6 +16,9 @@ pub fn on_request(mut stream: impl Read + Write, files: HashMap<String, Vec<u8>>
 
     if target.is_empty() {
         target = "index.html".into()
+    } else if target.contains("?") {
+        // chop query
+        target = target.split('?').collect::<Vec<&str>>()[0].to_string();
     }
 
     let mime = mime_guess::from_path(target.clone()).first().unwrap();

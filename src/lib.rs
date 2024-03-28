@@ -18,11 +18,18 @@ pub fn on_request(mut stream: impl Read + Write, files: HashMap<String, Vec<u8>>
         target = "index.html".into()
     }
 
-    let mime = mime_guess::from_path(target.clone()).first().unwrap();
+    let mime_guess = mime_guess::from_path(target.clone()).first();
 
     match files.get(&target) {
         Some(body) => {
             let length = body.len();
+            // finalize the mime type
+            let mime = mime_guess.unwrap_or(
+                // Default mime is text extension, so at least the file content can be read.
+                // Don't worry that it's being unwrapped unchecked, the value is ensured.
+                // Who ensures the value? It's me! @Tch1b0!
+                mime_guess::from_ext("txt".into()).first().unwrap()
+            );
 
             println!("200 {}", target);
             stream.write_all(

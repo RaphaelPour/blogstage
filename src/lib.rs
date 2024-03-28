@@ -13,7 +13,7 @@ pub fn on_request(mut stream: impl Read + Write, files: HashMap<String, Vec<u8>>
         .collect();
 
     let mut target: String = request[0].split(' ').collect::<Vec<&str>>()[1][1..].to_string();
-    
+
     if target.is_empty() {
         target = "index.html".into()
     }

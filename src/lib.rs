@@ -14,13 +14,11 @@ pub fn on_request(mut stream: impl Read + Write, files: HashMap<String, Vec<u8>>
 
     let mut target: String = request[0].split(' ').collect::<Vec<&str>>()[1][1..].to_string();
     
-    let mime_guess: Option<mime_guess::Mime>;
-
     if target.is_empty() {
         target = "index.html".into()
     }
 
-    mime_guess = mime_guess::from_path(target.clone()).first();
+    let mime_guess = mime_guess::from_path(target.clone()).first();
 
     match files.get(&target) {
         Some(body) => {
